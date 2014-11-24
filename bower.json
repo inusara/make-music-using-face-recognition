@@ -1,0 +1,8 @@
+{
+  "name": "make-music-using-face-recognition",
+  "private": true,
+  "dependencies": {
+    "jquery": "~1.11.1",
+    "tracking.js": "~1.1.0"
+  }
+}
