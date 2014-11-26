@@ -3,7 +3,7 @@ window.onload = function() {
 	var canvas = document.getElementById('canvas');
 	var context = canvas.getContext('2d');
 	var guiInterface = {
-		isTracking: true
+		isTracking: false
 	};
 
 	var faceTracker = new tracking.ObjectTracker('face');
