@@ -9,7 +9,6 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
-
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -21,21 +20,19 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-
-    <div class="hero-unit">
-      <h1>'Allo, 'Allo!</h1>
-      <p>You now have</p>
-      <ul>
-      <li>HTML5 Boilerplate</li>
-      <li>Sass</li>
-
-      </ul>
+    <div>
+      <video id="video" width="400" height="300" preload autoplay loop muted></video>
+      <canvas id="canvas" width="400" height="300"></canvas>
     </div>
-
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/dat-gui/build/dat.gui.js"></script>
+    <script src="bower_components/threejs/build/three.js"></script>
+    <script src="bower_components/tracking.js/build/tracking.js"></script>
     <!-- endbower -->
+    <script src="bower_components/tracking.js/build/data/face.js"></script>
     <!-- endbuild -->
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
