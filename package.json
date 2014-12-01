@@ -28,5 +28,10 @@
   },
   "engines": {
     "node": ">=0.10.0"
-  }
+  },
+  "scripts": {
+    "start": "node app.js",
+    "debug": "node debug app.js"
+  },
+  "main": "app.js"
 }
