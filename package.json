@@ -33,5 +33,9 @@
     "start": "node app.js",
     "debug": "node debug app.js"
   },
-  "main": "app.js"
+  "main": "app.js",
+  "dependencies": {
+    "finalhandler": "^0.3.2",
+    "serve-static": "^1.7.1"
+  }
 }
