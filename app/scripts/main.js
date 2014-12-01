@@ -112,4 +112,4 @@
 			}
 		});
 	};
-}(window, window.tracking, window.dat, window.flock));
+})(window, window.tracking, window.dat, window.flock);
