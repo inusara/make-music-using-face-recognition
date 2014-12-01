@@ -106,7 +106,7 @@
 				synth.play();
 				trackerTask.run();
 			} else {
-				synth.stop();
+				synth.pause();
 				trackerTask.stop();
 				clearCanvas();
 			}
