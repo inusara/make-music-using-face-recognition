@@ -1,13 +1,17 @@
 (function() {
-	var express = require('express');
-	var app = express();
-	 
-	app.set('port', process.env.PORT || 3000);
-	 
-	app.use(express.logger('dev'));
-	app.use(express.compress());
-	app.use(express.static(__dirname + '/dist'));
-	 
-	app.listen(app.get('port'), function() {
-	});
+	var finalhandler = require('finalhandler')
+	var http = require('http')
+	var serveStatic = require('serve-static')
+
+	// Serve up public/ftp folder
+	var serve = serveStatic('dist', {'index': ['index.html', 'index.htm']})
+
+	// Create server
+	var server = http.createServer(function(req, res){
+	  var done = finalhandler(req, res)
+	  serve(req, res, done)
+	})
+
+	// Listen
+	server.listen(3000)
 })();
