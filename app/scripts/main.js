@@ -15,10 +15,7 @@
 		tracking.Fast.THRESHOLD = 1;
 		FastTracker.prototype.threshold = tracking.Fast.THRESHOLD;
 
-		var face = new tracking.ObjectTracker('face');
-			face.setInitialScale(4);
-			face.setStepSize(2);
-			face.setEdgesDensity(0.1);
+		var face = new tracking.ObjectTracker(['face', 'eye']);
 
 		FastTracker.prototype.track = function(pixels, width, height) {
 			var classifiers = face.getClassifiers();
@@ -28,9 +25,15 @@
 		    }
 
 		    var results = [];
+		    var opt = { 'initialScale': 4, 'stepSize': 2, 'edgesDensity': 0.1 };
 
-		    classifiers.forEach(function(classifier) {
-		      results = results.concat(tracking.ViolaJones.detect(pixels, width, height, face.getInitialScale(), face.getScaleFactor(), face.getStepSize(), face.getEdgesDensity(), classifier));
+		    classifiers.forEach(function(classifier, index) {
+		      if(index === 1) {
+		      	opt.initialScale = face.getInitialScale();
+		      	opt.stepSize = face.getStepSize();
+		      	opt.edgesDensity = face.getEdgesDensity();
+		      }
+		      results = results.concat(tracking.ViolaJones.detect(pixels, width, height, opt.initialScale, face.getScaleFactor(), opt.stepSize, opt.edgesDensity, classifier));
 		    });
 
 			this.emit('track', {
@@ -43,9 +46,10 @@
 
 		tracker.on('track', function(event) {
 			clearCanvas();		
+			var style = ['#FE0002', '#1D87CB'];
 			if(event.data.length > 0) {
-				event.data.forEach(function(rect) {
-					context.strokeStyle = '#a64ceb';
+				event.data.forEach(function(rect, index) {
+					context.strokeStyle = style[index];
 					context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 					context.font = '11px Helvetica';
 					context.fillStyle = '#fff';
@@ -93,7 +97,7 @@
 		        options: {
 		            canvas: '#gfx',
 		            styles: {
-		                strokeColor: '#777777',
+		                strokeColor: '#FE0002',
 		                strokeWidth: 2
 		            }
 		        }
