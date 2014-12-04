@@ -4,7 +4,9 @@
 		var canvas = document.getElementById('canvas');
 		var context = canvas.getContext('2d');
 		var guiInterface = {
-			isTracking: false
+			isTracking: false,
+			faceTrackColor: '#FE0002',
+			eyeTrackColor: '#1D87CB',
 		};
 
 		var FastTracker = function() {
@@ -46,7 +48,7 @@
 
 		tracker.on('track', function(event) {
 			clearCanvas();		
-			var style = ['#FE0002', '#1D87CB'];
+			var style = [guiInterface.faceTrackColor, guiInterface.eyeTrackColor];
 			if(event.data.length > 0) {
 				event.data.forEach(function(rect, index) {
 					context.strokeStyle = style[index];
@@ -62,7 +64,7 @@
 		function clearCanvas() {
 			context.clearRect(0, 0, canvas.width, canvas.height);
 		}
-
+		//music visualization
 		var synth = flock.synth({
 		    synthDef: {
 		        ugen: 'flock.ugen.scope',
@@ -97,7 +99,7 @@
 		        options: {
 		            canvas: '#gfx',
 		            styles: {
-		                strokeColor: '#FE0002',
+		                strokeColor: guiInterface.faceTrackColor,
 		                strokeWidth: 2
 		            }
 		        }
@@ -105,6 +107,9 @@
 		});
 
 		var gui = new dat.GUI();
+		var visualizer = document.getElementById('gfx');
+		var context = visualizer.getContext('2d');
+
 		gui.add(guiInterface, 'isTracking').onChange(function(value) {
 			if(value) {
 				synth.play();
@@ -114,6 +119,16 @@
 				trackerTask.stop();
 				clearCanvas();
 			}
+		});
+
+		gui.addColor(guiInterface, 'faceTrackColor').onChange(function(value) {
+			guiInterface.faceTrackColor = value;
+			context.strokeStyle = value;
+			context.stroke();
+		});
+		
+		gui.addColor(guiInterface, 'eyeTrackColor').onChange(function(value) {
+			guiInterface.eyeTrackColor = value;
 		});
 	};
 })(window, window.tracking, window.dat, window.flock);
