@@ -108,7 +108,7 @@
 
 		var gui = new dat.GUI();
 		var visualizer = document.getElementById('gfx');
-		var context = visualizer.getContext('2d');
+		var visualContext = visualizer.getContext('2d');
 
 		gui.add(guiInterface, 'isTracking').onChange(function(value) {
 			if(value) {
@@ -123,8 +123,8 @@
 
 		gui.addColor(guiInterface, 'faceTrackColor').onChange(function(value) {
 			guiInterface.faceTrackColor = value;
-			context.strokeStyle = value;
-			context.stroke();
+			visualContext.strokeStyle = value;
+			visualContext.stroke();
 		});
 		
 		gui.addColor(guiInterface, 'eyeTrackColor').onChange(function(value) {
