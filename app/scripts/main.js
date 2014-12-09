@@ -1,6 +1,7 @@
 (function(window, tracking, dat, flock) {
 	'use strict';
 	window.onload = function() {
+	    var loopSynth, faceTrackSynth, eyesTrackSynth;
 		var canvas = document.getElementById('canvas');
 		var context = canvas.getContext('2d');
 		var guiInterface = {
@@ -21,6 +22,7 @@
 
 		FastTracker.prototype.track = function(pixels, width, height) {
 			var classifiers = face.getClassifiers();
+			faceTrackSynth.pause();
 
 		    if (!classifiers) {
 		      throw new Error('Object classifier not specified, try `new tracking.ObjectTracker("face")`.');
@@ -49,8 +51,12 @@
 		tracker.on('track', function(event) {
 			clearCanvas();		
 			var style = [guiInterface.faceTrackColor, guiInterface.eyeTrackColor];
+			
 			if(event.data.length > 0) {
 				event.data.forEach(function(rect, index) {
+        			if(index === 0 && !faceTrackSynth.play()) {
+        			    faceTrackSynth.play();
+        			} 
 					context.strokeStyle = style[index];
 					context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 					context.font = '11px Helvetica';
@@ -65,7 +71,7 @@
 			context.clearRect(0, 0, canvas.width, canvas.height);
 		}
 		//music visualization
-		var synth = flock.synth({
+		loopSynth = flock.synth({
 		    synthDef: {
 		        ugen: 'flock.ugen.scope',
 		        source: {
@@ -105,17 +111,47 @@
 		        }
 		    }
 		});
+		
+	    faceTrackSynth = flock.synth({
+            synthDef: {
+                ugen: 'flock.ugen.scope',
+                source: {
+                    ugen: 'flock.ugen.playBuffer',
+                    buffer: {
+                        url: 'audio/pejmaz-drum-and-hard-kick.wav'
+                    },
+                    loop: 1	                    
+                },
+		        options: {
+		            canvas: '#gfx',
+		            styles: {
+		                strokeColor: guiInterface.faceTrackColor,
+		                strokeWidth: 2
+		            }
+		        }
+            } 
+		});
 
+	    eyesTrackSynth = flock.synth({
+            synthDef: {
+                ugen: 'flock.ugen.playBuffer',
+                buffer: {
+                    url: 'audio/mhyst-cymbal-fill.wav'
+                }                   
+            } 
+		});
+		
 		var gui = new dat.GUI();
 		var visualizer = document.getElementById('gfx');
 		var visualContext = visualizer.getContext('2d');
 
 		gui.add(guiInterface, 'isTracking').onChange(function(value) {
 			if(value) {
-				synth.play();
+				flock.enviro.shared.play();
+				eyesTrackSynth.pause();
 				trackerTask.run();
 			} else {
-				synth.pause();
+			    flock.enviro.shared.stop();
 				trackerTask.stop();
 				clearCanvas();
 			}
