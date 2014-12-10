@@ -6,8 +6,10 @@
 		var context = canvas.getContext('2d');
 		var guiInterface = {
 			isTracking: false,
-			faceTrackColor: '#FE0002',
+			loopTrackColor: '#FE0002',
+			faceTrackColor: '#00FF00',
 			eyeTrackColor: '#1D87CB',
+			eyeTrackerBeat: ''
 		};
 
 		var FastTracker = function() {
@@ -22,7 +24,7 @@
 
 		FastTracker.prototype.track = function(pixels, width, height) {
 			var classifiers = face.getClassifiers();
-			faceTrackSynth.pause();
+			faceTrackSynth.set('faceBeats.mul', 0);
 
 		    if (!classifiers) {
 		      throw new Error('Object classifier not specified, try `new tracking.ObjectTracker("face")`.');
@@ -54,8 +56,8 @@
 			
 			if(event.data.length > 0) {
 				event.data.forEach(function(rect, index) {
-        			if(index === 0 && !faceTrackSynth.play()) {
-        			    faceTrackSynth.play();
+        			if(index === 0) {
+        			    faceTrackSynth.set('faceBeats.mul', 0.5);
         			} 
 					context.strokeStyle = style[index];
 					context.strokeRect(rect.x, rect.y, rect.width, rect.height);
@@ -103,9 +105,9 @@
 			        mul: 0.5
 		        },
 		        options: {
-		            canvas: '#gfx',
+		            canvas: '#loop-visualizer',
 		            styles: {
-		                strokeColor: guiInterface.faceTrackColor,
+		                strokeColor: guiInterface.loopTrackColor,
 		                strokeWidth: 2
 		            }
 		        }
@@ -116,42 +118,55 @@
             synthDef: {
                 ugen: 'flock.ugen.scope',
                 source: {
+                    id: 'faceBeats',
                     ugen: 'flock.ugen.playBuffer',
                     buffer: {
                         url: 'audio/pejmaz-drum-and-hard-kick.wav'
                     },
-                    loop: 1	                    
+                    loop: 1,
+                    mul: 0
                 },
 		        options: {
-		            canvas: '#gfx',
+		            canvas: '#tracking-visualizer',
 		            styles: {
 		                strokeColor: guiInterface.faceTrackColor,
 		                strokeWidth: 2
 		            }
 		        }
-            } 
+            }
 		});
 
 	    eyesTrackSynth = flock.synth({
             synthDef: {
-                ugen: 'flock.ugen.playBuffer',
-                buffer: {
-                    url: 'audio/mhyst-cymbal-fill.wav'
-                }                   
-            } 
+                ugen: 'flock.ugen.triggerCallback',
+                trigger: {
+                    ugen: 'flock.ugen.playBuffer',
+                    buffer: {
+                        url: 'audio/mhyst-cymbal-fill.wav'
+                    },
+                    loop: 1
+                },
+                options: {
+                    callback: {
+                        func: function () {
+                            $('#loop-visualizer').toggleClass('pulse');
+                        }
+                    }
+                }
+            },
+            addToEnvironment: false
 		});
 		
 		var gui = new dat.GUI();
-		var visualizer = document.getElementById('gfx');
+		var visualizer = document.getElementById('tracking-visualizer');
 		var visualContext = visualizer.getContext('2d');
 
 		gui.add(guiInterface, 'isTracking').onChange(function(value) {
 			if(value) {
-				flock.enviro.shared.play();
-				eyesTrackSynth.pause();
+                flock.enviro.shared.play();
 				trackerTask.run();
 			} else {
-			    flock.enviro.shared.stop();
+                flock.enviro.shared.stop();
 				trackerTask.stop();
 				clearCanvas();
 			}
@@ -165,6 +180,10 @@
 		
 		gui.addColor(guiInterface, 'eyeTrackColor').onChange(function(value) {
 			guiInterface.eyeTrackColor = value;
+		});
+		
+		gui.add(guiInterface, 'eyeTrackerBeat', { ride: 'audio/MRIsyn_Ride_ST_4.mp3', rim: 'audio/MRIsyn_Rim_ST_2.mp3' }).onChange(function(value) {
+		    eyesTrackSynth.set("url", value);
 		});
 	};
 })(window, window.tracking, window.dat, window.flock);
